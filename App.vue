@@ -22,4 +22,7 @@
 	@import "/common/icon.css";
 	/*全局样式*/
 	@import "/common/common.css";
+	/*基础UI库*/
+	@import "/common/base.css";
+	
 </style>

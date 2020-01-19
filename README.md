@@ -103,3 +103,7 @@
 	}
 ```
 ## 封装常用UI基础库
+- 仔细看common->base.css
+- 在App.vue中引入该css
+## 开发首页的基本配置
+### 配置page.json
