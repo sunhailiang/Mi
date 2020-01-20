@@ -107,3 +107,244 @@
 - 在App.vue中引入该css
 ## 开发首页的基本配置
 ### 配置page.json
+- 以首页为例子
+```js
+			"path": "pages/index/index",
+			"style": {
+				"app-plus": {
+					// 设置没有滚动条
+					"scrollIndicator":"none",
+					"titleNView": {//头部组件
+						"searchInput": { //搜索输入框
+							"align": "left",
+							"backgroundColor": "#F7F7F7",
+							"borderRadius": "4px",
+							"disabled": true, // 点击跳转
+							"placeholder": "智能积木 越野四驱车", // 默认提示
+							"placeholderColor": "#CCCCCC" // 提示背景颜色
+						},
+						"buttons": [
+							{// 消息
+								"color": "#989898",
+								"colorPressed": "#FD6801",
+								"float": "left",
+								"fontSize": "22px",
+								"fontSrc": "/static/font/iconfont.ttf",
+								"text": "\ue67a"
+							},
+							{   //扫一扫
+								"color": "#989898",
+								"colorPressed": "#FD6801",
+								"float": "right",
+								"fontSize": "22px",
+								"fontSrc": "/static/font/iconfont.ttf",
+								"text": "\ue661"
+							}
+						]
+					}
+				}
+			}
+			
+```
+
+## 封装图片轮播组件
+- 根目录下创建components
+- 
+> components->index->SwiperImg.vue
+
+```js
+<template>
+	<swiper indicator-dots autoplay :interval="3000" :duration="1000" circular>// 无缝衔接，懒加载，必要高度，小圆点，自动滚动
+		<block v-for="(item, index) in imgs" :key="index">
+			<swiper-item @tap="ImgTapHandler(item)"><image lazy-load style="height:350upx;" :src="item.src" mode=""></image></swiper-item>
+		</block>
+	</swiper>
+</template>
+
+<script>
+export default {
+	props: {
+		imgs: Array
+	},
+	methods:{
+		ImgTapHandler(img){
+			console.log("点击了",img)
+		}
+	}
+};
+</script>
+
+<style></style>
+
+```
+
+## 封装通用导航
+
+> components->index->IndexNav.vue
+
+```js
+<template>
+	<view class="row j-center m-2">
+		<view v-for="(item, index) in navs" @tap="navTapHandle(item)" :key="index" class="span-4 d-flex flex-column j-center a-center py-1">
+			<image :src="item.src" style="width: 60upx;height: 60upx;" mode="widthFix"></image>
+			<text class="font-sm">{{ item.text }}</text>
+		</view>
+	</view>
+</template>
+
+<script>
+export default {
+	props: {
+		navs: Array
+	},
+	methods:{
+		navTapHandle(item){
+			console.log("你愁啥？导航没看过？",item)
+		}
+	}
+};
+</script>
+
+```
+
+## 封装全局组件-横向分割线
+- 全局组件，需要在main.js中全局注册，这样频繁使用时直接调用即可了
+> components->common->Divder.vue
+```js
+<template>
+	<view style="height: 18upx; background-color: #F5F5F5;"></view>
+</template>
+<script>
+	export default{
+		name:'Divder'
+	}
+</script>
+
+```
+> 全局调用 main.js
+```js
+// 引入公共组件
+import Divder from '@/components/common/Divder.vue'
+Vue.component("divder",Divder)
+```
+
+## 封装三格广告位
+> components->index->ThreeAdv.vue
+
+```js
+<template>
+	<view class="d-flex">
+		<image :src="advs.big.src" lazy-load style="width: 373upx;height: 530upx;border-right: 2upx solid #F5F5F5; " mode=""></image>
+	    <view class="d-flex flex-column">
+			<image :src="advs.smallTop.src" style="width: 375upx; height: 264upx; border-bottom:2upx solid #F5F5F5 ;" mode=""></image>
+		    <image :src="advs.smallBottom.src" style="width: 375upx; height: 264upx;" mode=""></image>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default{
+		name:'ThreeAdv',
+		props:{
+			advs:Object
+		}
+	}
+</script>
+
+```
+
+## 封装全局通用卡片
+> components->common->card.vue
+```js
+<template>
+	<view class="card">
+		<!-- header -->
+		<view v-if="showHeader" class="p-2 border-bottom main-border-color">
+			<!-- 头部插槽，可以自定义 -->
+			<slot name="header">
+				<text class="font-md font-weight">{{ header }}</text>
+			</slot>
+		</view>
+		<!-- body -->
+		<view>
+			<!-- 是否渲染图片 -->
+			<image v-if="bodyImg" :src="bodyImg" mode="widthFix"></image>
+			<slot />
+		</view>
+	</view>
+</template>
+
+<script>
+export default {
+	name: 'Card',
+	props: {
+		// 头部文字
+		header: String,
+		// body
+		bodyImg: String,
+		showHeader:{
+			type:Boolean,
+			default:true
+		}
+	}
+};
+</script>
+
+<style></style>
+
+```
+
+## 封装通用的价格组件
+> components->common->Price.vue
+```js
+<template>
+	<view class="d-flex my-1">
+		<view class="d-flex main-text-color font-md line-h">
+			<text class="a-self-start font-sm">￥</text>
+			<slot></slot> // 采用slot写法这样在页面呈现比较好看 <Price>2020</Price> 而且不用定义props
+		</view>
+		<view class="font-sm text-light-muted line-through ml-1 a-self-end">￥2699</view>
+	</view>
+</template>
+
+<script>
+ export default{
+	 name:'Price'
+ }	
+</script>
+```
+
+## 封装通用列表组件
+> components>common->CommonList.vue
+```js
+<template>
+	<view style="width: 372.5upx;">
+		<image :src="item.cover" mode="widthFix" lazy-load=""></image>
+		<view class="p-2 pt-1">
+			<view class="font-md">{{ item.title }}</view>
+			<text class="d-block font text-light-muted">{{ item.desc }}</text>
+			<!-- 使用价格组件 -->
+			<view class="d-flex m-1">
+				<Price>{{ item.cprice }}</Price>
+				<view class="font-sm text-light-muted line-through ml-1 a-self-end">￥{{ item.cprice }}</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+import Price from '@/components/common/Price.vue';
+export default {
+	name: 'CommonList',
+	props: {
+		item: Object
+	},
+	components: {
+		Price
+	}
+};
+</script>
+
+<style></style>
+
+```
